@@ -7,7 +7,7 @@ import time
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
 TARGET_URL = os.environ.get("TARGET_URL")
-MOBILE_URL = os.environ.get("MOBILE")
+MOBILE_URL = os.environ.get("MOBILE_URL")
 KEYWORD = os.environ.get("KEYWORD")
 
 def send_telegram(msg):
