@@ -2,8 +2,8 @@ name: Scheduled Playwright Monitor
 
 on:
   schedule:
-    # Runs every 5 minutes from 00:00 to 07:55 UTC (09:00–16:55 JST)
-    - cron: '*/5 0-7 * * *'
+    # Runs every 5 minutes from 00:00 to 08:55 UTC (09:00–17:55 JST)
+    - cron: '*/5 0-8 * * *'
 
   workflow_dispatch:
 
