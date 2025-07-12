@@ -32,23 +32,12 @@ def main():
             page = browser.new_page()
             
             # Go to the target URL
-            page.goto(TARGET_URL, timeout=30000)
-            page.wait_for_load_state("networkidle", timeout=15000)
-            time.sleep(3)
+            page.goto(TARGET_URL, timeout=10000)
+            page.wait_for_load_state("networkidle", timeout=5000)
 
             # If a new tab (search form) is opened, switch to it
             pages = browser.contexts[0].pages
-            if len(pages) > 1:
-                search_page = pages[-1]
-            else:
-                search_page = page
-
-            # Wait for the search form to fully load
-            try:
-                search_page.wait_for_load_state("networkidle", timeout=10000)
-            except Exception:
-                pass
-            time.sleep(2)
+            search_page = pages[-1] if len(pages) > 1 else page
 
             # Tick the checkbox for 間取り "2K ～ 2LDK"
             try:
@@ -69,20 +58,15 @@ def main():
             except Exception:
                 pass
                 
-            search_page.wait_for_load_state("networkidle", timeout=15000)
-            time.sleep(2)
+            search_page.wait_for_load_state("networkidle", timeout=5000)
 
             # Look through all table rows on the results page
             rows = search_page.query_selector_all('tr')
-            found = False
-            
             for row in rows:
-                text = row.inner_text()  # Get all the text in this row
-                # Only process rows that contain our target keyword and look like property data
+                text = row.inner_text()
                 if KEYWORD in text:
-                    send_telegram(f"Match found: {KEYWORD} at {MOBILE_URL}")
-                    found = True
-                    break  # Stop checking after the first match
+                    send_telegram(f"Match found: {KEYWORD} {MOBILE_URL}")
+                    break
             
             browser.close()
             

@@ -57,7 +57,7 @@ Go to your repository’s **Settings > Secrets and variables > Actions** to add 
 
 ### Workflow schedule
 
-The workflow runs every 5 minutes between 00:00 and 10:55 UTC (09:00–19:55 JST).
+The workflow runs every 5 minutes between 000:00 to 07:55 UTC (09:00–16:55 JST)
 
 ## How it works
 
