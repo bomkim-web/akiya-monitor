@@ -10,12 +10,6 @@ TARGET_URL = os.environ.get("TARGET_URL")
 MOBILE_URL = os.environ.get("MOBILE_URL")
 KEYWORD = os.environ.get("KEYWORD")
 
-print("TELEGRAM_TOKEN:", TELEGRAM_TOKEN)
-print("TELEGRAM_CHAT_ID:", TELEGRAM_CHAT_ID)
-print("TARGET_URL:", TARGET_URL)
-print("MOBILE_URL:", MOBILE_URL)
-print("KEYWORD:", KEYWORD)
-
 def send_telegram(msg):
     """
     Send a notification message via Telegram bot.
