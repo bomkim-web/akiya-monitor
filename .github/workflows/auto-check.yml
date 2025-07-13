@@ -1,0 +1,31 @@
+name: Scheduled Monitor
+
+on:
+  schedule:
+    - cron: '*/5 0-8 * * *' # Runs every 5 minutes from 00:00 to 08:55 UTC (09:00–17:55 JST)
+  workflow_dispatch:
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    env:
+      TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      TARGET_URL: ${{ secrets.TARGET_URL }}
+      MOBILE_URL: ${{ secrets.MOBILE_URL }}
+      KEYWORD: ${{ secrets.KEYWORD }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          python -m playwright install chromium
+
+      - name: Run script
+        run: python main.py
