@@ -32,12 +32,10 @@ def main():
             page = browser.new_page()
             
             # Go to the target URL
-            page.goto(TARGET_URL, timeout=10000)
-            page.wait_for_load_state("networkidle", timeout=5000)
-
-            # If a new tab (search form) is opened, switch to it
-            pages = browser.contexts[0].pages
-            search_page = pages[-1] if len(pages) > 1 else page
+            with page.expect_popup() as search_page:
+                page.goto(TARGET_URL, timeout=10000)
+                page.wait_for_load_state("networkidle", timeout=5000)
+                search_page = search_page.value
 
             # Tick the checkbox for 間取り "2K ～ 2LDK"
             try:
@@ -45,27 +43,36 @@ def main():
             except Exception:
                 pass
 
-            # Select "一般申込" in 優先募集種別 dropdown
-            try:
-                search_page.locator('select[name="akiyaInitRM.akiyaRefM.yusenBoshu"]').select_option(['一般申込'])
-            except Exception:
-                pass
-
             # Click the search button
             try:
-                search_button = search_page.get_by_role('link', name='検索する').first
+                search_button = search_page.get_by_role('link', name='検索する').nth(1)
                 search_button.click()
             except Exception:
                 pass
                 
             search_page.wait_for_load_state("networkidle", timeout=5000)
 
-            # Look through all table rows on the results page
-            rows = search_page.query_selector_all('tr')
+            # Select the table with class 'cell666666' 
+            tables = search_page.query_selector_all('table.cell666666')
+
+            # Select the second table (index 1) which contains the search results
+            table = tables[1]
+
+            # Get all the rows (tr) of this table
+            rows = table.query_selector_all('tr')[1:]  # [1:] skips the first tr (header row)
+
             for row in rows:
-                text = row.inner_text()
-                if KEYWORD in text:
-                    send_telegram(f"Match found: {KEYWORD} {MOBILE_URL}")
+                # For each row, you can get the values of each column (td)
+                cells = row.query_selector_all('td')
+                print(row)
+                # Example: 2nd td (building name), 4th td (category)
+                if not cells or len(cells) < 4:
+                    continue  # Safety: skip rows with not enough columns
+                name = cells[1].inner_text().strip()
+                type_ = cells[3].inner_text().strip()
+                if name == KEYWORD and (type_ == "一般" or type_ == "応援"):
+                    match_type = type_
+                    send_telegram(f"Match found: {name} ({match_type}) {MOBILE_URL}")
                     break
             
             browser.close()
