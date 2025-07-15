@@ -48,7 +48,7 @@ def main():
                 except Exception as e:
                     print(f"Search button click error: {e}")
                 
-                print("Selecting 50 results per page...")
+                print("Selecting 20 results per page...")
                 try:
                     with search_page.expect_navigation():
                         search_page.get_by_role("combobox").select_option("20")
