@@ -59,8 +59,7 @@ def main():
                 print("Selecting 50 results per page...")
                 try:
                     with search_page.expect_navigation():
-                        search_page.get_by_role("combobox").select_option("50")
-                    # search_page.wait_for_load_state("networkidle", timeout=5000)  # Wait for network to be idle
+                        search_page.get_by_role("combobox").select_option("10")
                 except Exception as e:
                     print(f"Combobox select error: {e}")
 
