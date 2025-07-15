@@ -17,15 +17,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
 
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-          python -m playwright install chromium
+      - name: Install the project
+        run: uv sync
 
-      - name: Run script
-        run: python main.py
+      - name: Install Playwright browsers
+        run: uv run playwright install chromium
+        
+      - name: Run the project
+        run: uv run main.py
+

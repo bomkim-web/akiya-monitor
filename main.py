@@ -24,61 +24,75 @@ def send_telegram(msg):
         return False
 
 def main():
-    try:
-        # Start Playwright (browser automation)
-        with sync_playwright() as p:
-            # Launch a headless (invisible) browser for production
-            browser = p.chromium.launch(headless=True)
-            page = browser.new_page()
-            
-            # Go to the target URL
-            with page.expect_popup() as search_page:
-                page.goto(TARGET_URL, timeout=10000)
-                page.wait_for_load_state("networkidle", timeout=5000)
-                search_page = search_page.value
+    max_retries = 3
+    retry_delay = 5  # seconds
+    for attempt in range(1, max_retries + 1):
+        try:
+            print(f"Attempt {attempt}: Starting Playwright automation...")
+            # Start Playwright (browser automation)
+            with sync_playwright() as p:
+                print("Launching browser...")
+                browser = p.chromium.launch(headless=True)  # Set headless=True for no GUI, slow_mo for debugging
+                context = browser.new_context()
+                page = browser.new_page()
 
-            # Tick the checkbox for 間取り "2K ～ 2LDK"
-            try:
-                search_page.get_by_role('cell', name='2K ～ 2LDK', exact=True).get_by_role('checkbox').click()
-            except Exception:
-                pass
+                print(f"Navigating to the target URL...")
+                with page.expect_popup() as search_page_info:
+                    page.goto(TARGET_URL)
+                    search_page = search_page_info.value
 
-            # Click the search button
-            try:
-                search_button = search_page.get_by_role('link', name='検索する').nth(1)
-                search_button.click()
-            except Exception:
-                pass
+                print("Ticking checkboxes...")
+                try:
+                    search_page.get_by_role('cell', name='2K ～ 2LDK', exact=True).get_by_role('checkbox').check()
+                    search_page.get_by_role("cell", name="3K ～ 3LDK", exact=True).get_by_role("checkbox").check()
+                    search_page.get_by_role("cell", name="4K以上", exact=True).get_by_role("checkbox").check()
+                except Exception as e:
+                    print(f"Checkbox tick error: {e}")
+
+                print("Clicking search button...")
+                try:
+                    search_button = search_page.get_by_role('link', name='検索する')
+                    search_button.first.click()
+                except Exception as e:
+                    print(f"Search button click error: {e}")
                 
-            search_page.wait_for_load_state("networkidle", timeout=5000)
+                print("Selecting 50 results per page...")
+                try:
+                    with search_page.expect_navigation():
+                        search_page.get_by_role("combobox").select_option("50")
+                    search_page.page.wait_for_load_state("networkidle", timeout=5000)  # Wait for network to be idle
+                except Exception as e:
+                    print(f"Combobox select error: {e}")
 
-            # Select the table with class 'cell666666' 
-            tables = search_page.query_selector_all('table.cell666666')
+                print("Selecting result table...")
+                tables = search_page.query_selector_all('table.cell666666')
+                table = tables[1]
 
-            # Select the second table (index 1) which contains the search results
-            table = tables[1]
+                print("Getting table rows...")
+                rows = table.query_selector_all('tr')[1:]  # [1:] skips the first tr (header row)
 
-            # Get all the rows (tr) of this table
-            rows = table.query_selector_all('tr')[1:]  # [1:] skips the first tr (header row)
-
-            for row in rows:
-                # For each row, you can get the values of each column (td)
-                cells = row.query_selector_all('td')
-                print(row)
-                # Example: 2nd td (building name), 4th td (category)
-                if not cells or len(cells) < 4:
-                    continue  # Safety: skip rows with not enough columns
-                name = cells[1].inner_text().strip()
-                type_ = cells[3].inner_text().strip()
-                if name == KEYWORD and (type_ == "一般" or type_ == "応援"):
-                    match_type = type_
-                    send_telegram(f"Match found: {name} ({match_type}) {MOBILE_URL}")
-                    break
+                for idx, row in enumerate(rows):
+                    cells = row.query_selector_all('td')
+                    name = cells[1].inner_text().strip()
+                    type_ = cells[3].inner_text().strip().replace("\n", "")
+                    print(f"Row {idx}")
+                    if KEYWORD in name:
+                        match_type = type_
+                        print(f"Match found at row {idx}")
+                        send_telegram(f"Match found: {name} ({match_type}) {MOBILE_URL}")
+                        break
+                
+                context.close()
+                print("Context closed.")
+                browser.close()
+                print("Browser closed.")
+                return # Exit after successful run
             
-            browser.close()
-            
-    except Exception as e:
-        raise
+        except Exception as e:
+            print(f"Attempt {attempt} failed: {e}")
+            time.sleep(retry_delay)  # Wait before retrying
+
+    print("All attempts failed. Exiting...")
 
 if __name__ == "__main__":
     # This means: only run main() if this file is run directly (not imported)
