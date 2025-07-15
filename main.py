@@ -41,14 +41,6 @@ def main():
                     page.goto(TARGET_URL)
                     search_page = search_page_info.value
 
-                print("Ticking checkboxes...")
-                try:
-                    search_page.get_by_role('cell', name='2K ～ 2LDK', exact=True).get_by_role('checkbox').check()
-                    search_page.get_by_role("cell", name="3K ～ 3LDK", exact=True).get_by_role("checkbox").check()
-                    search_page.get_by_role("cell", name="4K以上", exact=True).get_by_role("checkbox").check()
-                except Exception as e:
-                    print(f"Checkbox tick error: {e}")
-
                 print("Clicking search button...")
                 try:
                     search_button = search_page.get_by_role('link', name='検索する')
@@ -59,7 +51,7 @@ def main():
                 print("Selecting 50 results per page...")
                 try:
                     with search_page.expect_navigation():
-                        search_page.get_by_role("combobox").select_option("10")
+                        search_page.get_by_role("combobox").select_option("20")
                 except Exception as e:
                     print(f"Combobox select error: {e}")
 
