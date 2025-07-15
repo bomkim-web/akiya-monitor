@@ -60,7 +60,7 @@ def main():
                 try:
                     with search_page.expect_navigation():
                         search_page.get_by_role("combobox").select_option("50")
-                    search_page.page.wait_for_load_state("networkidle", timeout=5000)  # Wait for network to be idle
+                    # search_page.wait_for_load_state("networkidle", timeout=5000)  # Wait for network to be idle
                 except Exception as e:
                     print(f"Combobox select error: {e}")
 
@@ -71,7 +71,7 @@ def main():
                 print("Getting table rows...")
                 rows = table.query_selector_all('tr')[1:]  # [1:] skips the first tr (header row)
 
-                for idx, row in enumerate(rows):
+                for idx, row in enumerate(rows, start=1):
                     cells = row.query_selector_all('td')
                     name = cells[1].inner_text().strip()
                     type_ = cells[3].inner_text().strip().replace("\n", "")
