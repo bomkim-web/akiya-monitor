@@ -32,8 +32,39 @@ def main():
             # Start Playwright (browser automation)
             with sync_playwright() as p:
                 print("Launching browser...")
-                browser = p.chromium.launch(headless=True)  # Set headless=True for no GUI, slow_mo for debugging
-                context = browser.new_context()
+
+                browser = p.chromium.launch(
+                    headless=True,  # Run in headless mode
+                    args=[
+                        "--disable-background-networking",
+                        "--disable-background-timer-throttling",
+                        "--disable-breakpad",
+                        "--disable-client-side-phishing-detection",
+                        "--disable-component-update",
+                        "--disable-default-apps",
+                        "--disable-dev-shm-usage",
+                        "--disable-extensions",
+                        "--disable-features=site-per-process",
+                        "--disable-hang-monitor",
+                        "--disable-ipc-flooding-protection",
+                        "--disable-popup-blocking",
+                        "--disable-prompt-on-repost",
+                        "--disable-renderer-backgrounding",
+                        "--disable-sync",
+                        "--force-color-profile=srgb",
+                        "--metrics-recording-only",
+                        "--no-sandbox",
+                        "--no-zygote",
+                        "--headless=new",
+                        "--single-process",
+                        "--enable-automation",
+                        "--hide-scrollbars",
+                        "--mute-audio",
+                        "--no-first-run",
+                        "--disable-gpu",
+                    ]
+                )
+
                 page = browser.new_page()
 
                 print(f"Navigating to the target URL...")
@@ -65,16 +96,16 @@ def main():
                 for idx, row in enumerate(rows, start=1):
                     cells = row.query_selector_all('td')
                     name = cells[1].inner_text().strip()
-                    type_ = cells[3].inner_text().strip().replace("\n", "")
-                    print(f"Row {idx}")
+                    type_ = cells[3].inner_text().strip().replace("\n", "").replace("　", "")
+                    madori = cells[5].inner_text().strip()
+                    print(f"{idx}")
+
                     if KEYWORD in name:
                         match_type = type_
-                        print(f"Match found at row {idx}")
-                        send_telegram(f"Match found: {name} ({match_type}) {MOBILE_URL}")
+                        print(f"Match found.")
+                        send_telegram(f"Match found: {name} ({match_type}, {madori}) {MOBILE_URL}")
                         break
                 
-                context.close()
-                print("Context closed.")
                 browser.close()
                 print("Browser closed.")
                 return # Exit after successful run
