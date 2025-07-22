@@ -13,7 +13,7 @@ jobs:
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
       TARGET_URL: ${{ secrets.TARGET_URL }}
       MOBILE_URL: ${{ secrets.MOBILE_URL }}
-      KEYWORD: ${{ secrets.KEYWORD }}
+      KEYWORDS: ${{ secrets.KEYWORDS }}
     steps:
       - uses: actions/checkout@v4
 
