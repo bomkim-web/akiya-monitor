@@ -2,13 +2,14 @@ import os
 from playwright.sync_api import sync_playwright
 import requests
 import time
+import json
 
 # Get secrets from environment variables
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
 TARGET_URL = os.environ.get("TARGET_URL")
 MOBILE_URL = os.environ.get("MOBILE_URL")
-KEYWORD = os.environ.get("KEYWORD")
+KEYWORDS = json.loads(os.environ.get("KEYWORDS", "[]"))  # Default to empty list if not set
 
 def send_telegram(msg):
     """
@@ -79,10 +80,10 @@ def main():
                 except Exception as e:
                     print(f"Search button click error: {e}")
                 
-                print("Selecting 20 results per page...")
+                print("Selecting 50 results per page...")
                 try:
                     with search_page.expect_navigation():
-                        search_page.get_by_role("combobox").select_option("20")
+                        search_page.get_by_role("combobox").select_option("50")
                 except Exception as e:
                     print(f"Combobox select error: {e}")
 
@@ -100,7 +101,7 @@ def main():
                     madori = cells[5].inner_text().strip()
                     print(f"{idx}")
 
-                    if KEYWORD in name:
+                    if any(keyword in name for keyword in KEYWORDS):
                         match_type = type_
                         print(f"Match found.")
                         send_telegram(f"Match found: {name} ({match_type}, {madori}) {MOBILE_URL}")
