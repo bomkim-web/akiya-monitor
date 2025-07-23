@@ -6,4 +6,5 @@ __pycache__/
 *.env
 .vscode/
 .git/
+.github/
 .DS_Store
