@@ -9,6 +9,13 @@ wheels/
 # Virtual environments
 .venv
 
-.env
-.env.yaml
+# Editor settings
 .vscode/
+
+# OS files
+.DS_Store
+
+# Secrets and environment
+.env
+.env.*
+.env.yaml

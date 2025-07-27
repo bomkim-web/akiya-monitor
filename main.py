@@ -106,7 +106,7 @@ def main():
                     madori = cells[5].inner_text().strip()
                     print(f"{idx}")
 
-                    if any(keyword in name for keyword in KEYWORDS) and madori in MADORIS:
+                    if any(keyword in name for keyword in KEYWORDS) and (not MADORIS or madori in MADORIS):
                         match_type = type_
                         print(f"Match found.")
                         send_telegram(f"Match found: {name} ({match_type}, {madori}) {MOBILE_URL}")

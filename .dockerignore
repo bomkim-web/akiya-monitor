@@ -3,10 +3,12 @@ __pycache__/
 *.pyo
 *.pyd
 .env
-*.env
+.env.*
+.env.yaml
 .venv
 .vscode/
 .git/
 .github/
+.gitignore
 .DS_Store
-.env.yaml
+.vscode/
