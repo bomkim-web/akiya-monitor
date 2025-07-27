@@ -1,8 +1,12 @@
 import os
-from playwright.sync_api import sync_playwright
-import requests
-import time
+from dotenv import load_dotenv
 import json
+import requests
+from playwright.sync_api import sync_playwright
+import time
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Get secrets from environment variables
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
@@ -10,6 +14,7 @@ TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
 TARGET_URL = os.environ.get("TARGET_URL")
 MOBILE_URL = os.environ.get("MOBILE_URL")
 KEYWORDS = json.loads(os.environ.get("KEYWORDS", "[]"))  # Default to empty list if not set
+MADORIS = json.loads(os.environ.get("MADORIS", "[]"))  # Default to empty list if not set
 
 def send_telegram(msg):
     """
@@ -101,7 +106,7 @@ def main():
                     madori = cells[5].inner_text().strip()
                     print(f"{idx}")
 
-                    if any(keyword in name for keyword in KEYWORDS):
+                    if any(keyword in name for keyword in KEYWORDS) and madori in MADORIS:
                         match_type = type_
                         print(f"Match found.")
                         send_telegram(f"Match found: {name} ({match_type}, {madori}) {MOBILE_URL}")

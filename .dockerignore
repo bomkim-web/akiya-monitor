@@ -9,3 +9,4 @@ __pycache__/
 .git/
 .github/
 .DS_Store
+.env.yaml
