@@ -93,12 +93,21 @@ def main():
                     print(f"Combobox select error: {e}")
 
                 print("Selecting result table...")
-                tables = search_page.query_selector_all('table.cell666666')
-                table = tables[1]
+                try:
+                    tables = search_page.query_selector_all('table.cell666666')
+                    print(len(tables), "tables found with class 'cell666666'")
+                    if len(tables) < 2:
+                        raise ValueError("Expected at least 2 tables with class 'cell666666', but found fewer.")
+                    table = tables[1]
+                except Exception as e:
+                    print(f"Error selecting result table: {e}")
+                    return                
 
                 print("Getting table rows...")
                 rows = table.query_selector_all('tr')[1:]  # [1:] skips the first tr (header row)
-
+                if len(rows) != 50:
+                    raise ValueError(f"Expected 50 rows, but found {len(rows)}")
+                
                 for idx, row in enumerate(rows, start=1):
                     cells = row.query_selector_all('td')
                     name = cells[1].inner_text().strip()
