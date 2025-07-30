@@ -96,8 +96,10 @@ def main():
                 try:
                     tables = search_page.query_selector_all('table.cell666666')
                     print(len(tables), "tables found with class 'cell666666'")
-                    if len(tables) < 2:
-                        raise ValueError("Expected at least 2 tables with class 'cell666666', but found fewer.")
+                    if len(tables) != 2:
+                        error_msg = f"Expected exactly 2 tables with class 'cell666666', but found {len(tables)}."
+                        send_telegram(error_msg)
+                        raise ValueError(error_msg)
                     table = tables[1]
                 except Exception as e:
                     print(f"Error selecting result table: {e}")
@@ -106,8 +108,10 @@ def main():
                 print("Getting table rows...")
                 rows = table.query_selector_all('tr')[1:]  # [1:] skips the first tr (header row)
                 if len(rows) != 50:
-                    raise ValueError(f"Expected 50 rows, but found {len(rows)}")
-                
+                    error_msg = f"Expected 50 rows, but found {len(rows)}"
+                    send_telegram(error_msg)
+                    raise ValueError(error_msg)
+
                 for idx, row in enumerate(rows, start=1):
                     cells = row.query_selector_all('td')
                     name = cells[1].inner_text().strip()
@@ -126,8 +130,10 @@ def main():
                 return # Exit after successful run
             
         except Exception as e:
-            print(f"Attempt {attempt} failed: {e}")
-            time.sleep(retry_delay)  # Wait before retrying
+            error_msg = f"Attempt {attempt} failed: {e}"
+            print(error_msg)
+            send_telegram(error_msg)
+            time.sleep(retry_delay) # Wait before retrying
 
     print("All attempts failed. Exiting...")
 
