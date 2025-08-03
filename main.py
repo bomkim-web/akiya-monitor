@@ -114,9 +114,9 @@ def main():
 
                 for idx, row in enumerate(rows, start=1):
                     cells = row.query_selector_all('td')
-                    name = cells[1].inner_text().strip()
+                    name = cells[1].inner_text().strip().replace("\n", "")
                     type_ = cells[3].inner_text().strip().replace("\n", "").replace("　", "")
-                    madori = cells[5].inner_text().strip()
+                    madori = cells[5].inner_text().strip()                 
                     print(f"{idx}")
 
                     if any(keyword in name for keyword in KEYWORDS) and (not MADORIS or madori in MADORIS):
