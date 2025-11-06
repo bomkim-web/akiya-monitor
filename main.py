@@ -27,11 +27,12 @@ def send_telegram(msg):
         response = requests.post(url, data=data)
         return response.status_code == 200
     except Exception as e:
+        print(f"Error sending Telegram message: {e}")
         return False
 
 def main():
     max_retries = 3
-    retry_delay = 5  # seconds
+    retry_delay = 10  # seconds
     for attempt in range(1, max_retries + 1):
         try:
             print(f"Attempt {attempt}: Starting Playwright automation...")
@@ -73,7 +74,7 @@ def main():
 
                 page = browser.new_page()
 
-                print(f"Navigating to the target URL...")
+                print("Navigating to the target URL...")
                 with page.expect_popup() as search_page_info:
                     page.goto(TARGET_URL)
                     search_page = search_page_info.value
@@ -121,7 +122,7 @@ def main():
 
                     if any(keyword in name for keyword in KEYWORDS) and (not MADORIS or madori in MADORIS):
                         match_type = type_
-                        print(f"Match found.")
+                        print("Match found.")
                         send_telegram(f"Match found: {name} ({match_type}, {madori}) {MOBILE_URL}")
                         break
                 
