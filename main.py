@@ -1,9 +1,10 @@
 import os
-from dotenv import load_dotenv
 import json
 import requests
-from playwright.sync_api import sync_playwright
 import time
+import asyncio
+from playwright.sync_api import sync_playwright
+from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()
@@ -32,10 +33,21 @@ def send_telegram(msg):
 
 def main():
     max_retries = 3
-    retry_delay = 10  # seconds
+    retry_delay = 5  # seconds
     for attempt in range(1, max_retries + 1):
         try:
             print(f"Attempt {attempt}: Starting Playwright automation...")
+
+            try:
+                loop = asyncio.get_event_loop()
+                if loop.is_running():
+                    print("Closing existing event loop to avoid conflict...")
+                    loop.close()
+            except Exception:
+                pass
+
+            asyncio.set_event_loop(asyncio.new_event_loop())
+
             # Start Playwright (browser automation)
             with sync_playwright() as p:
                 print("Launching browser...")
